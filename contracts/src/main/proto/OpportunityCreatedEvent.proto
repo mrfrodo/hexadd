@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package com.frodo.hexadd.events;
+
+option java_package = "com.frodo.hexadd.events";
+option java_multiple_files = true;
+
+// ── Envelope ─────────────────────────────────────────────
+message EventMetadata {
+  string event_id      = 1;  // UUID — idempotency / dedup
+  string event_type    = 2;  // "OpportunityCreated"
+  int32  event_version = 3;  // schema version
+  string source        = 4;  // "sales-service"
+  int64  occurred_at   = 5;  // epoch millis — when it happened
+  int64  published_at  = 6;  // epoch millis — when it hit Kafka
+}
+
+// ── Enums ─────────────────────────────────────────────────
+enum OpportunityStatus {
+  OPPORTUNITY_STATUS_UNSPECIFIED = 0;
+  OPPORTUNITY_STATUS_NEW         = 1;
+  OPPORTUNITY_STATUS_QUALIFIED   = 2;
+  OPPORTUNITY_STATUS_CLOSED_WON  = 3;
+  OPPORTUNITY_STATUS_CLOSED_LOST = 4;
+}
+
+// ── Fact Event ────────────────────────────────────────────
+message OpportunityCreatedEvent {
+  EventMetadata metadata       = 1;  // envelope always first
+
+  string            opportunity_id = 2;
+  string            customer_id    = 3;
+  string            name           = 4;
+  int64             value_cents    = 5;
+  OpportunityStatus status         = 6;
+}
